@@ -1,6 +1,8 @@
 import { AssetContainer, Vector3 } from "@babylonjs/core";
 import {
   AnimationManager,
+  DYNAMIC_ANIMATION_NAME_STRINGS,
+  DynamicAnimationName,
   ManagedAnimation,
   ManagedAnimationOptions,
   MISSING_ANIMATION_DEFAULT_ACTION_FALLBACK_TIME,
@@ -84,6 +86,7 @@ export class DynamicAnimationManager
     }
 
     const newAnimationGroup = this.getAnimationGroupByName(newAnimationName);
+
     if (options.animationDurationOverrideOption)
       newAnimationGroup.setDuration(options.animationDurationOverrideOption);
 
@@ -144,5 +147,25 @@ export class DynamicAnimationManager
 
   getFallbackAnimationName(animationName: DynamicAnimationName) {
     return undefined;
+  }
+}
+
+export class RotateAroundPoint extends DynamicAnimation {
+  name = DYNAMIC_ANIMATION_NAME_STRINGS[DynamicAnimationName.RotateAroundPoint];
+  duration = 2000;
+  point: Vector3 = Vector3.Zero();
+
+  constructor(scene: AssetContainer) {
+    super(false);
+    const parentMesh = scene.meshes[0];
+  }
+
+  animateScene(scene: AssetContainer) {
+    const parentMesh = scene.meshes[0];
+    if (!parentMesh)
+      return console.error("expected mesh not found in dynamic animation");
+
+    const elapsed = Date.now() - this.timeStarted;
+    const percentCompleted = elapsed / this.duration;
   }
 }
