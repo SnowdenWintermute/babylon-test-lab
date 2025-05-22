@@ -4,15 +4,6 @@ export function pointTransformNodeToward(
   transformNode: TransformNode,
   targetPosition: Vector3
 ) {
-  // const lookAt = Matrix.LookAtLH(
-  //   transformNode.getAbsolutePosition(),
-  //   targetPosition,
-  //   Vector3.Up()
-  // );
-
-  // transformNode.rotationQuaternion =
-  //   Quaternion.FromRotationMatrix(lookAt).invert();
-
   const worldPos = transformNode.getAbsolutePosition();
   const lookAtMatrix = Matrix.LookAtLH(worldPos, targetPosition, Vector3.Up());
 
