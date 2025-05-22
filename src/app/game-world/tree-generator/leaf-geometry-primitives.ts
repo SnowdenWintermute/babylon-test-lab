@@ -1,6 +1,6 @@
 import { Vector2, Vector3 } from "@babylonjs/core";
 
-export class BranchGeometry {
+export class LeafGeometryPrimitives {
   verts: Vector3[] = [];
   indices: number[] = [];
   normals: Vector3[] = [];

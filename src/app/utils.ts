@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector2, Vector3 } from "@babylonjs/core";
 
 export function removeFromArray<T>(array: T[], item: T): undefined | T {
   const indexToRemove = array.indexOf(item);
@@ -97,4 +97,11 @@ export function easeIn(t: number) {
 
 export function easeOut(t: number) {
   return t * (2 - t);
+}
+
+export function getVector3ValuesAsXYZArray(vec: Vector3) {
+  return [vec.x, vec.y, vec.z];
+}
+export function getVector2ValuesAsXYArray(vec: Vector2) {
+  return [vec.x, vec.y];
 }
