@@ -1,7 +1,7 @@
 import { Mesh, Scene, Vector2, Vector3, VertexData } from "@babylonjs/core";
 import { RandomNumberGenerator } from "../random-number-generator";
 import { Branch } from "./branch";
-import { applyEuler } from "../utils";
+import { Vector3Utils } from "../utils";
 
 export class TreeGenerator {
   rng = new RandomNumberGenerator(1);
@@ -91,12 +91,12 @@ export class TreeGenerator {
       ) {
         const angle = (2.0 * Math.PI * segmentIndex) / branch.segmentCount;
 
-        const vertex = applyEuler(
+        const vertex = Vector3Utils.applyEuler(
           new Vector3(Math.cos(angle), 0, Math.sin(angle)).scale(sectionRadius),
           sectionOrientation
         ).add(sectionOrigin);
 
-        const normal = applyEuler(
+        const normal = Vector3Utils.applyEuler(
           new Vector3(Math.cos(angle), 0, Math.sin(angle)),
           sectionOrientation
         ).normalize();

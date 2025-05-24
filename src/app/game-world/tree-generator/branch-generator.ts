@@ -3,7 +3,7 @@ import { Branch } from "./branch";
 import { BranchGeometryPrimitives } from "./branch-geometry-primitives";
 import { TreeType } from "./tree-options/enums";
 import { TreeOptions } from "./tree-options/tree-options";
-import { applyEuler } from "../utils";
+import { QuaternionUtils, Vector3Utils } from "../utils";
 import { getVector3ValuesAsXYZArray } from "@/app/utils";
 import { RandomNumberGenerator } from "../random-number-generator";
 import { BranchNodeOptions } from "./tree-options/branch-options";
@@ -58,12 +58,12 @@ export class BranchGenerator {
         const angle = (2.0 * Math.PI * segmentIndex) / branch.segmentCount;
 
         // Create the segment vertex
-        const vertex = applyEuler(
+        const vertex = Vector3Utils.applyEuler(
           new Vector3(Math.cos(angle), 0, Math.sin(angle)).scale(sectionRadius),
           sectionOrientation
         ).add(sectionOrigin);
 
-        const normal = applyEuler(
+        const normal = Vector3Utils.applyEuler(
           new Vector3(Math.cos(angle), 0, Math.sin(angle)),
           sectionOrientation
         ).normalize();
@@ -100,7 +100,10 @@ export class BranchGenerator {
       });
 
       sectionOrigin.add(
-        applyEuler(new Vector3(0, sectionLength, 0), sectionOrientation)
+        Vector3Utils.applyEuler(
+          new Vector3(0, sectionLength, 0),
+          sectionOrientation
+        )
       );
 
       this.applyGnarliness(
@@ -116,23 +119,26 @@ export class BranchGenerator {
         sectionOrientation.z
       );
 
-      const qTwist = new THREE.Quaternion().setFromAxisAngle(
-        new THREE.Vector3(0, 1, 0),
-        this.options.branch.twist[branch.level]
+      const qTwist = Quaternion.RotationAxis(
+        Vector3.Up(),
+        branchNodeOptions.twist
       );
 
-      const qForce = new THREE.Quaternion().setFromUnitVectors(
-        new THREE.Vector3(0, 1, 0),
-        new THREE.Vector3().copy(this.options.branch.force.direction)
+      const qForce = Quaternion.FromUnitVectorsToRef(
+        Vector3.Up(),
+        this.treeOptions.branch.force.direction,
+        new Quaternion()
       );
 
       qSection.multiply(qTwist);
-      qSection.rotateTowards(
+
+      QuaternionUtils.RotateTowards(
+        qSection,
         qForce,
-        this.options.branch.force.strength / sectionRadius
+        this.treeOptions.branch.force.strength
       );
 
-      sectionOrientation.setFromQuaternion(qSection);
+      Vector3Utils.setFromQuaternion(sectionOrientation, qSection);
     }
 
     this.generateBranchIndices(indexOffset, branch);

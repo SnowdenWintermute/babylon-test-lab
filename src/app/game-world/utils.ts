@@ -10,6 +10,7 @@ import {
   AbstractMesh,
   Mesh,
   Quaternion,
+  Matrix,
 } from "@babylonjs/core";
 import { Radians } from "../named-types";
 import { gameWorld } from "../scene-manager";
@@ -124,7 +125,42 @@ export function createBillboard(text: string, scene: Scene) {
  * @param euler The Euler rotation angles in radians (XYZ order).
  * @returns The original Vector3 with the rotation applied.
  */
-export function applyEuler(vec: Vector3, euler: Vector3): Vector3 {
-  const quat = Quaternion.RotationYawPitchRoll(euler.y, euler.x, euler.z);
-  return vec.rotateByQuaternionToRef(quat, vec);
+export class Vector3Utils {
+  static applyEuler(vec: Vector3, euler: Vector3): Vector3 {
+    const quat = Quaternion.RotationYawPitchRoll(euler.y, euler.x, euler.z);
+    return vec.rotateByQuaternionToRef(quat, vec);
+  }
+
+  static setFromQuaternion(v: Vector3, q: Quaternion) {
+    Vector3.TransformCoordinatesToRef(
+      v,
+      Matrix.FromQuaternionToRef(q, new Matrix()),
+      v
+    );
+  }
+}
+
+export class QuaternionUtils {
+  /** Difference in radians between two quaternions */
+  static Angle(a: Quaternion, b: Quaternion): Radians {
+    const dot = a.dot(b);
+    return 2 * Math.acos(Math.min(Math.abs(dot), 1.0));
+  }
+
+  /** Rotates this quaternion by a given angular step to the defined quaternion q.
+   * The method ensures that the final quaternion will not overshoot q. */
+  static RotateTowards(
+    q1: Quaternion,
+    q2: Quaternion,
+    maxAngle: Radians
+  ): Quaternion {
+    const angle = QuaternionUtils.Angle(q1, q2);
+    if (angle === 0) return q2.clone();
+
+    const t = Math.min(1, maxAngle / angle); // clamp between 0 and 1
+
+    const result = new Quaternion();
+    Quaternion.SlerpToRef(q1, q2, t, result);
+    return result;
+  }
 }
